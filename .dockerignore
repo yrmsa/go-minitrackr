@@ -1,0 +1,32 @@
+# Binaries
+*.exe
+*.dll
+*.so
+*.dylib
+go-minitrackr
+
+# Data
+data/
+*.db
+*.db-shm
+*.db-wal
+
+# Development
+.git/
+.gitignore
+*.md
+!README.md
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+tmp/
+dist/

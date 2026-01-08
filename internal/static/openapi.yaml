@@ -1,0 +1,122 @@
+openapi: 3.0.3
+info:
+  title: Minitrackr API
+  description: Minimal self-hosted issue tracker
+  version: 1.0.0
+servers:
+  - url: /api
+paths:
+  /issues:
+    get:
+      summary: List all issues
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Issue'
+    post:
+      summary: Create issue
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [title]
+              properties:
+                title:
+                  type: string
+                status:
+                  type: string
+                  enum: [todo, doing, done]
+                  default: todo
+                priority:
+                  type: string
+                  enum: [low, medium, high]
+                  default: medium
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Issue'
+  /issues/{id}:
+    get:
+      summary: Get issue by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Issue'
+        '404':
+          description: Not found
+    put:
+      summary: Update issue
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [title]
+              properties:
+                title:
+                  type: string
+                status:
+                  type: string
+                  enum: [todo, doing, done]
+                priority:
+                  type: string
+                  enum: [low, medium, high]
+      responses:
+        '204':
+          description: Updated
+    delete:
+      summary: Delete issue
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Deleted
+components:
+  schemas:
+    Issue:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        status:
+          type: string
+          enum: [todo, doing, done]
+        priority:
+          type: string
+          enum: [low, medium, high]
+        created_at:
+          type: integer
+        updated_at:
+          type: integer

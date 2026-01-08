@@ -1,0 +1,19 @@
+# Binaries
+*.exe
+linear-lite
+go-minitrackr
+
+# Database
+data/
+*.db
+*.db-shm
+*.db-wal
+
+# Go
+go.sum
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

@@ -1,0 +1,48 @@
+{
+  "name": "go-minitrackr",
+  "description": "Minimal self-hosted issue tracker",
+  "type": "docker",
+  "docker": {
+    "dockerfile": "Dockerfile",
+    "buildContext": "."
+  },
+  "ports": [
+    {
+      "containerPort": 3000,
+      "protocol": "tcp"
+    }
+  ],
+  "volumes": [
+    {
+      "name": "go-minitrackr-data",
+      "mountPath": "/data"
+    }
+  ],
+  "env": [
+    {
+      "key": "PORT",
+      "value": "3000"
+    },
+    {
+      "key": "DB_PATH",
+      "value": "/data/go-minitrackr.db"
+    },
+    {
+      "key": "GOMEMLIMIT",
+      "value": "25MiB"
+    }
+  ],
+  "resources": {
+    "memoryLimit": "64Mi",
+    "memoryReservation": "32Mi",
+    "cpuLimit": "0.5"
+  },
+  "healthCheck": {
+    "path": "/health",
+    "port": 3000,
+    "interval": 30,
+    "timeout": 3,
+    "retries": 3
+  },
+  "restart": "unless-stopped"
+}

@@ -1,0 +1,124 @@
+{{define "board-content"}}
+<div class="content-header">
+    <h1 class="content-title">Board</h1>
+    <button class="btn btn-primary" onclick="document.getElementById('board-create-form').classList.toggle('hidden')">
+        <span>+</span>
+        <span>New Issue</span>
+    </button>
+</div>
+
+<div id="board-create-form" class="issue-form hidden">
+    <form hx-post="/board/issues" hx-target="#column-todo .board-issues" hx-swap="afterbegin" hx-on::after-request="this.reset(); document.getElementById('board-create-form').classList.add('hidden')">
+        <input type="text" name="title" placeholder="Issue title..." required autofocus class="form-input">
+        <div class="form-row">
+            <input type="hidden" name="status" value="todo">
+            <select name="priority" class="form-select">
+                <option value="low">Low</option>
+                <option value="medium" selected>Medium</option>
+                <option value="high">High</option>
+            </select>
+            <button type="submit" class="btn btn-primary">Create</button>
+            <button type="button" class="btn btn-secondary" onclick="this.closest('.issue-form').classList.add('hidden')">Cancel</button>
+        </div>
+    </form>
+</div>
+
+<div class="content-body">
+    <div class="board-columns">
+        <div class="board-column" id="column-todo">
+            <div class="column-header">
+                <h3 class="column-title">Todo</h3>
+                <span class="column-count">{{len .TodoIssues}}</span>
+            </div>
+            <div class="board-issues">
+                {{range .TodoIssues}}
+                {{template "board-card" .}}
+                {{end}}
+            </div>
+        </div>
+
+        <div class="board-column" id="column-doing">
+            <div class="column-header">
+                <h3 class="column-title">Doing</h3>
+                <span class="column-count">{{len .DoingIssues}}</span>
+            </div>
+            <div class="board-issues">
+                {{range .DoingIssues}}
+                {{template "board-card" .}}
+                {{end}}
+            </div>
+        </div>
+
+        <div class="board-column" id="column-done">
+            <div class="column-header">
+                <h3 class="column-title">Done</h3>
+                <span class="column-count">{{len .DoneIssues}}</span>
+            </div>
+            <div class="board-issues">
+                {{range .DoneIssues}}
+                {{template "board-card" .}}
+                {{end}}
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}
+
+{{define "board-card"}}
+<div class="board-card" id="card-{{.ID}}">
+    <div class="card-header">
+        <span class="card-id">#{{.ID}}</span>
+        <div style="display: flex; gap: 6px; align-items: center;">
+            <select name="priority-{{.ID}}" class="card-priority priority-{{.Priority}}"
+                    hx-put="/board/issues/{{.ID}}" 
+                    hx-vals='js:{title: document.querySelector("#card-{{.ID}} .card-title").innerText, status: "{{.Status}}", priority: event.target.value}'
+                    hx-target="#card-{{.ID}}"
+                    hx-swap="outerHTML">
+                <option value="low" {{if eq .Priority "low"}}selected{{end}}>Low</option>
+                <option value="medium" {{if eq .Priority "medium"}}selected{{end}}>Medium</option>
+                <option value="high" {{if eq .Priority "high"}}selected{{end}}>High</option>
+            </select>
+            <button class="btn-delete" 
+                    hx-delete="/board/issues/{{.ID}}" 
+                    hx-confirm="Delete issue #{{.ID}}?"
+                    hx-target="#card-{{.ID}}"
+                    hx-swap="delete swap:0.2s">×</button>
+        </div>
+    </div>
+    <div class="card-title"
+         contenteditable="true" 
+         hx-put="/board/issues/{{.ID}}" 
+         hx-trigger="blur[this.dataset.original !== this.innerText]" 
+         hx-include="[name='priority-{{.ID}}']" 
+         hx-vals='js:{title: event.target.innerText, status: "{{.Status}}"}'
+         hx-target="#card-{{.ID}}"
+         hx-swap="outerHTML"
+         onfocus="this.dataset.original = this.innerText">{{.Title}}</div>
+    <div class="card-actions">
+        {{if eq .Status "todo"}}
+        <button class="card-btn" 
+                hx-put="/board/issues/{{.ID}}" 
+                hx-vals='js:{title: document.querySelector("#card-{{.ID}} .card-title").innerText, status: "doing", priority: document.querySelector("[name=\"priority-{{.ID}}\"]").value}'
+                hx-target="#card-{{.ID}}"
+                hx-swap="delete">→ Doing</button>
+        {{else if eq .Status "doing"}}
+        <button class="card-btn" 
+                hx-put="/board/issues/{{.ID}}" 
+                hx-vals='js:{title: document.querySelector("#card-{{.ID}} .card-title").innerText, status: "todo", priority: document.querySelector("[name=\"priority-{{.ID}}\"]").value}'
+                hx-target="#card-{{.ID}}"
+                hx-swap="delete">← Todo</button>
+        <button class="card-btn" 
+                hx-put="/board/issues/{{.ID}}" 
+                hx-vals='js:{title: document.querySelector("#card-{{.ID}} .card-title").innerText, status: "done", priority: document.querySelector("[name=\"priority-{{.ID}}\"]").value}'
+                hx-target="#card-{{.ID}}"
+                hx-swap="delete">→ Done</button>
+        {{else if eq .Status "done"}}
+        <button class="card-btn" 
+                hx-put="/board/issues/{{.ID}}" 
+                hx-vals='js:{title: document.querySelector("#card-{{.ID}} .card-title").innerText, status: "doing", priority: document.querySelector("[name=\"priority-{{.ID}}\"]").value}'
+                hx-target="#card-{{.ID}}"
+                hx-swap="delete">← Doing</button>
+        {{end}}
+    </div>
+</div>
+{{end}}

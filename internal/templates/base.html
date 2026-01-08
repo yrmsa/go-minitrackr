@@ -1,0 +1,46 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{if .Title}}{{.Title}} - {{end}}Minitrackr</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1 class="logo">Minitrackr</h1>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/inbox" class="nav-item{{if eq .ActiveView "inbox"}} active{{end}}">
+                    <span class="nav-icon">📥</span>
+                    <span class="nav-label">Inbox</span>
+                </a>
+                <a href="/backlog" class="nav-item{{if eq .ActiveView "backlog"}} active{{end}}">
+                    <span class="nav-icon">📋</span>
+                    <span class="nav-label">Backlog</span>
+                </a>
+                <a href="/board" class="nav-item{{if eq .ActiveView "board"}} active{{end}}">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-label">Board</span>
+                </a>
+                <a href="/settings" class="nav-item{{if eq .ActiveView "settings"}} active{{end}}">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-label">Settings</span>
+                </a>
+            </nav>
+        </aside>
+        <main class="main-content">
+            {{if eq .ActiveView "backlog"}}{{template "backlog-content" .}}{{end}}
+            {{if eq .ActiveView "inbox"}}{{template "inbox-content" .}}{{end}}
+            {{if eq .ActiveView "board"}}{{template "board-content" .}}{{end}}
+            {{if eq .ActiveView "settings"}}{{template "settings-content" .}}{{end}}
+        </main>
+    </div>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
+{{end}}

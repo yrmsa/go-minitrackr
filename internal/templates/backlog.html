@@ -1,0 +1,83 @@
+{{define "backlog-content"}}
+<div class="content-header">
+    <h1 class="content-title">Backlog</h1>
+    <button class="btn btn-primary" onclick="document.getElementById('create-form').classList.toggle('hidden')">
+        <span>+</span>
+        <span>New Issue</span>
+    </button>
+</div>
+
+<div id="create-form" class="issue-form hidden">
+    <form hx-post="/backlog/issues" hx-target="#issue-list" hx-swap="afterbegin" hx-on::after-request="this.reset(); document.getElementById('create-form').classList.add('hidden')">
+        <input type="text" name="title" placeholder="Issue title..." required autofocus class="form-input">
+        <div class="form-row">
+            <select name="status" class="form-select">
+                <option value="todo">Todo</option>
+                <option value="doing">Doing</option>
+                <option value="done">Done</option>
+            </select>
+            <select name="priority" class="form-select">
+                <option value="low">Low</option>
+                <option value="medium" selected>Medium</option>
+                <option value="high">High</option>
+            </select>
+            <button type="submit" class="btn btn-primary">Create</button>
+            <button type="button" class="btn btn-secondary" onclick="this.closest('.issue-form').classList.add('hidden')">Cancel</button>
+        </div>
+    </form>
+</div>
+
+<div class="content-body">
+    {{if .Issues}}
+    <div id="issue-list" class="issue-list">
+        {{range .Issues}}
+        {{template "issue-row" .}}
+        {{end}}
+    </div>
+    {{else}}
+    <div id="issue-list" class="issue-list">
+        <p class="text-secondary">No issues yet. Create one to get started.</p>
+    </div>
+    {{end}}
+</div>
+{{end}}
+
+{{define "issue-row"}}
+<div class="issue-row" id="issue-{{.ID}}">
+    <div class="issue-id">#{{.ID}}</div>
+    <div class="issue-title" 
+         contenteditable="true" 
+         hx-put="/backlog/issues/{{.ID}}" 
+         hx-trigger="blur[this.dataset.original !== this.innerText]" 
+         hx-include="[name='status-{{.ID}}'],[name='priority-{{.ID}}']" 
+         hx-vals='js:{title: event.target.innerText}'
+         hx-target="#issue-{{.ID}}"
+         hx-swap="outerHTML"
+         onfocus="this.dataset.original = this.innerText">{{.Title}}</div>
+    <select name="status-{{.ID}}" class="issue-status status-{{.Status}}" 
+            hx-put="/backlog/issues/{{.ID}}" 
+            hx-include="[name='priority-{{.ID}}']" 
+            hx-vals='js:{title: document.querySelector("#issue-{{.ID}} .issue-title").innerText, status: event.target.value}'
+            hx-target="#issue-{{.ID}}"
+            hx-swap="outerHTML">
+        <option value="todo" {{if eq .Status "todo"}}selected{{end}}>Todo</option>
+        <option value="doing" {{if eq .Status "doing"}}selected{{end}}>Doing</option>
+        <option value="done" {{if eq .Status "done"}}selected{{end}}>Done</option>
+    </select>
+    <select name="priority-{{.ID}}" class="issue-priority priority-{{.Priority}}"
+            hx-put="/backlog/issues/{{.ID}}" 
+            hx-include="[name='status-{{.ID}}']" 
+            hx-vals='js:{title: document.querySelector("#issue-{{.ID}} .issue-title").innerText, priority: event.target.value}'
+            hx-target="#issue-{{.ID}}"
+            hx-swap="outerHTML">
+        <option value="low" {{if eq .Priority "low"}}selected{{end}}>Low</option>
+        <option value="medium" {{if eq .Priority "medium"}}selected{{end}}>Medium</option>
+        <option value="high" {{if eq .Priority "high"}}selected{{end}}>High</option>
+    </select>
+    <button class="btn-delete" 
+            hx-delete="/backlog/issues/{{.ID}}" 
+            hx-confirm="Delete issue #{{.ID}}?"
+            hx-target="#issue-{{.ID}}"
+            hx-swap="delete swap:0.2s">×</button>
+</div>
+{{end}}
