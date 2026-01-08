@@ -29,7 +29,7 @@ COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 VOLUME ["/data"]
 
 # Set environment
-ENV PORT=8822
+ENV PORT=0.0.0.0:8822
 ENV DB_PATH=/data/go-minitrackr.db
 ENV GOMEMLIMIT=25MiB
 
