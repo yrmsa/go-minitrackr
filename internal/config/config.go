@@ -13,7 +13,7 @@ type Config struct {
 
 func Load() *Config {
 	return &Config{
-		Port:     getEnv("PORT", "3000"),
+		Port:     getEnv("PORT", "8822"),
 		DBPath:   getEnv("DB_PATH", "./data/go-minitrackr.db"),
 		MemLimit: getEnv("GOMEMLIMIT", "25MiB"),
 	}
