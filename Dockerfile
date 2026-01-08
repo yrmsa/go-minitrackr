@@ -29,12 +29,12 @@ COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 VOLUME ["/data"]
 
 # Set environment
-ENV PORT=3000
+ENV PORT=8822
 ENV DB_PATH=/data/go-minitrackr.db
 ENV GOMEMLIMIT=25MiB
 
 # Expose port
-EXPOSE 3000
+EXPOSE 8822
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
